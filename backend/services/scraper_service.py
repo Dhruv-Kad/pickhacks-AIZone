@@ -1,8 +1,8 @@
 import os
 import requests
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 
-SEARCH_API_KEY = "770c8d30c32868e1ca74c91adadb0a2121e52bab"
+SEARCH_API_KEY = "3b98fbc57de1326aaf0c02fd03e419ec4f3b9ab3"
 SAVE_FOLDER = "./downloads"
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
