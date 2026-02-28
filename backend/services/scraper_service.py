@@ -35,7 +35,7 @@ def ai_query_web(q, fold):
     for link in linklist:
         n -= 1
         if n>0:
-            download_pdf(q,fold)
+            download_pdf(link,fold)
 
 
 if __name__ == "__main__":
