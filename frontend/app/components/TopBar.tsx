@@ -44,9 +44,9 @@ export default function TopBar(props: {
             AI
           </div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold">AIZone</div>
+            <div className="text-sm font-semibold">DSTK</div>
             <div className="text-xs text-muted-foreground">
-              PDF Knowledge Assistant
+              
             </div>
           </div>
         </div>

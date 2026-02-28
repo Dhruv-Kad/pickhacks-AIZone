@@ -16,8 +16,8 @@ export default function Page() {
     try {
       const docs = await getDocuments();
       setDocuments(docs);
-    } catch {
-      // Backend might not be running yet
+    } catch (e) {
+      console.error("getDocuments failed:", e);
     }
   }, []);
 
@@ -26,7 +26,7 @@ export default function Page() {
   }, [refreshDocuments]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen">
       <TopBar
         documents={documents}
         selectedDocId={selectedDocId}
@@ -34,15 +34,38 @@ export default function Page() {
         onDocumentsChange={refreshDocuments}
       />
 
-      <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 md:grid-cols-[1fr_380px]">
-        <div className="h-[calc(100vh-57px)]">
-          <ChatPanel selectedDocId={selectedDocId} onSources={setSources} />
-        </div>
+      {/* Comfortable padding + spacing */}
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 md:px-6">
+  <div
+    className={
+      sources.length > 0
+        ? "grid gap-4 md:grid-cols-[1fr_420px] md:items-start"
+        : "flex justify-center"
+    }
+  >
+    {/* Chat */}
+    <section
+      className={
+        sources.length > 0
+          ? "rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-sm"
+          : "w-full max-w-3xl rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-sm"
+      }
+    >
+      <div className="h-[calc(100vh-140px)]">
+        <ChatPanel selectedDocId={selectedDocId} onSources={setSources} />
+      </div>
+    </section>
 
-        <div className="hidden h-[calc(100vh-57px)] md:block">
+    {/* Citations (only show when sources exist) */}
+    {sources.length > 0 && (
+      <aside className="hidden md:block rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-sm">
+        <div className="h-[calc(100vh-140px)]  overflow-y-auto p-4">
           <CitationPanel sources={sources} />
         </div>
-      </main>
+      </aside>
+    )}
+  </div>
+</main>
     </div>
   );
 }
