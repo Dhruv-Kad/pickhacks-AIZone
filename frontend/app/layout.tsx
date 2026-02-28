@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PENIS BALLS - PDF Knowledge Assistant",
-  description: "Ask questions about your PDF documents using AI",
+  description: "Ask questions about zoning laws!",
 };
 
 export default function RootLayout({

@@ -28,7 +28,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
           </div>
         ) : (
           sources.map((s, idx) => (
-            <div key={idx} className="rounded-md border p-3">
+            <div key={idx} className="rounded-md border p-5 transition-all duration-200 hover:shadow-xl hover:bg-accent hover:-translate-y-1 hover:border-primary/40 cursor-pointer">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-medium">
   {(() => {
