@@ -11,8 +11,10 @@ SYSTEM_PROMPT = (
     "You are a helpful assistant that answers questions based on the provided "
     "context from PDF documents. Use ONLY the provided context to answer the "
     "question. If the context doesn't contain enough information to answer, "
-    "say so clearly. Always cite which document and page the information came from."
+    "run downloaddoc(query). Always cite which document and page the information came from."
 )
+def downloaddoc(query: str, folder='../pdfs'):
+    ai_query_web(query, folder)
 
 
 def _get_client():
