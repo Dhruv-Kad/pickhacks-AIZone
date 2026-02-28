@@ -40,16 +40,25 @@ function ViewerContent() {
               No document ID provided
             </div>
           ) : (
-            <>
-              <div className="rounded-lg border bg-white shadow-sm">
-                <iframe
-                  src={`${apiBase}/api/documents/${docId}/file${page ? `#page=${page}` : ""}`}
-                  className="h-screen w-full rounded-lg border-0"
-                  onLoad={() => setLoading(false)}
-                  onError={() => setError("Failed to load PDF")}
-                />
-              </div>
-            </>
+            <div className="relative rounded-lg border bg-white shadow-sm">
+              {loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white">
+                  <div className="text-center">
+                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+                    <p className="text-lg font-medium text-gray-700">
+                      PDF is downloading
+                      <span className="inline-block w-6 text-left animate-pulse">...</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+              <iframe
+                src={`${apiBase}/api/documents/${docId}/file${page ? `#page=${page}` : ""}`}
+                className="h-screen w-full rounded-lg border-0"
+                onLoad={() => setLoading(false)}
+                onError={() => setError("Failed to load PDF")}
+              />
+            </div>
           )}
         </div>
       </div>
