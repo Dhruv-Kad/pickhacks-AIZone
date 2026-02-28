@@ -47,7 +47,12 @@ export default function ChatPanel(props: {
         ...prev,
         { role: "assistant", content: data.answer },
       ]);
-      onSources(data.sources ?? []);
+      onSources(
+  (data.sources ?? []).map((s: any) => ({
+    ...s,
+    docId: s.docId ?? s.document_id ?? selectedDocId ?? undefined,
+  }))
+);
     } catch {
       setMessages((prev) => [
         ...prev,
