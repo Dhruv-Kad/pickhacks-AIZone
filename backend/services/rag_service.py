@@ -1,5 +1,5 @@
 import os
-
+from scraper_service import ai_query_web
 from google import genai
 
 from services.embedding_service import embed_query
@@ -35,10 +35,13 @@ def generate_answer(query: str, document_id: str | None = None) -> dict:
     distances = results["distances"][0] if results["distances"] else []
 
     if not documents:
-        return {
-            "answer": "No relevant information found in the uploaded documents.",
-            "sources": [],
-        }
+        ai_query_web(query,"../pdfs")
+        generate_answer(query,document_id)
+
+       # return {
+       #     "answer": "No relevant information found in the uploaded documents.",
+       #     "sources": [],
+       # }
 
     # 3. Build context string from retrieved chunks
     context_parts = []
