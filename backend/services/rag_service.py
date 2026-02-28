@@ -1,12 +1,13 @@
 import os
 from services.ingest_service import ingest_folder
 from services.scraper_service import ai_query_web
-from services.vector_store import rebuild_doc_metadata
+from services.vector_store import _rebuild_doc_metadata
 from google import genai
 from google.genai import types
 
 from services.embedding_service import embed_query
 from services.vector_store import query_chunks
+import services.ingest_service as impser
 
 _client = None
 
@@ -22,7 +23,7 @@ def downloaddoc(query: str):
     """Search the web for relevant PDF documents and download them."""
     ai_query_web(query, "./pdfs")
     ingest_folder()
-    rebuild_doc_metadata()
+    impser.rebuild_doc_metadata()
     
 
 downloaddoc_declaration = types.FunctionDeclaration(
