@@ -5,7 +5,7 @@ import type { Source } from "./types";
 
 
 
-export default function CitationPanel({ sources }: { sources: Source[] }) {
+export default function CitationPanel({ sources, onViewPdf }: { sources: Source[]; onViewPdf?: (pdf: { docId?: string; page?: number }) => void }) {
   return (
     <aside className="panel-enter h-full bg-background animate-in fade-in duration-300">
       <div className="flex items-center justify-between border-b px-4 py-3">
@@ -32,19 +32,16 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-bold">
   {(() => {
-    const href =
-      s.pdfUrl
-        ? (s.page ? `${s.pdfUrl}#page=${s.page}` : s.pdfUrl)
-        : s.docId
-          ? `/viewer?docId=${encodeURIComponent(s.docId)}&page=${s.page}`
-          : null;
+    const handleClick = () => {
+      if (s.docId && onViewPdf) {
+        onViewPdf({ docId: s.docId, page: s.page });
+      }
+    };
 
-    return href ? (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="underline underline-offset-4 hover:opacity-80"
+    return s.docId ? (
+      <button
+        onClick={handleClick}
+        className="underline underline-offset-4 hover:opacity-80 text-left"
       >
           {(() => {
   const baseName = s.filename.replace(/\.pdf$/i, ""); // remove existing .png if present
@@ -55,7 +52,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
 
   return baseName + ".pdf";
 })()}
-      </a>
+      </button>
     ) : (
       <span>{s.filename}</span>
     );
@@ -63,7 +60,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
 </div>
                 <div className="rounded bg-white sflex shrink-0 items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    Relevance: {Math.round(s.relevance_score * 100)}%
+                  Relevance: {Math.round(s.relevance_score * 100)}%
                   </span>
                 </div>
               </div>
