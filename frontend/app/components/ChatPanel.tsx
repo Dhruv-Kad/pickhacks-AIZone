@@ -3,22 +3,27 @@
 import { useMemo, useRef, useState } from "react";
 import type { ChatMessage, Source } from "./types";
 import { sendChat } from "../lib/api";
+import { MessageDisplay } from "./MessageDisplay";
 
 const bubbleDelayMs = 1000; // 500–2000
 
 export default function ChatPanel(props: {
   selectedDocId: string | null;
   onSources: (sources: Source[]) => void;
+  /** Optional style to apply to the user input box (e.g. {backgroundColor: '#ff0'}) */
+  inputStyle?: React.CSSProperties;
+  /** Additional Tailwind classes to merge with the default input styling */
+  inputClassName?: string;
 }) {
-  const { selectedDocId, onSources } = props;
+  const { selectedDocId, onSources, inputStyle, inputClassName } = props;
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
-        "Upload a PDF and ask me anything about it.\n\n" +
+        "If you reading this, you is a bitch.\n\n" +
         "Examples:\n" +
-        '- "What is this document about?"\n' +
+        '- "PP SUCKER?"\n' +
         '- "Summarize the key findings"\n' +
         '- "What does section 3 say about...?"',
     },
@@ -122,7 +127,8 @@ async function send() {
 }
 
   return (
-    <section className="flex h-full flex-col">
+    // add a shadow so the chat panel stands out
+    <section className="flex h-full flex-col rounded-2xl shadow-xl shadow-black/20 overflow-hidden">
       <div className="border-b px-4 py-3">
         <div className="text-sm font-semibold">Chat</div>
         <div className="text-xs text-muted-foreground">
@@ -132,17 +138,7 @@ async function send() {
 
       <div className="flex-1 space-y-3 overflow-auto p-4">
         {messages.map((m, idx) => (
-          <div
-            key={idx}
-            className={[
-              "chat-msg-enter max-w-[85%] whitespace-pre-wrap rounded-lg border px-3 py-2 text-sm",
-              m.role === "user"
-                ? "ml-auto bg-black text-white"
-                : "mr-auto bg-background",
-            ].join(" ")}
-          >
-            {m.content}
-          </div>
+          <MessageDisplay key={idx} message={m} />
         ))}
 
         <div ref={bottomRef} />
@@ -151,7 +147,11 @@ async function send() {
       <div className="border-t p-4">
         <div className="flex gap-2">
           <input
-            className="h-11 flex-1 rounded-md border bg-background px-3 text-sm outline-none"
+            style={inputStyle}
+            className={[
+              "h-11 flex-1 rounded-md border bg-background px-3 text-sm outline-none",
+              inputClassName ?? "",
+            ].join(" ")}
             placeholder="Ask a question about your documents..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -161,7 +161,10 @@ async function send() {
             disabled={loading}
           />
           <button
-            className="h-11 rounded-md bg-black px-4 text-sm font-semibold text-white disabled:opacity-50"
+            className={[
+              "h-11 rounded-md bg-black px-4 text-sm font-semibold text-white disabled:opacity-50 transition-all",
+              canSend ? "hover:bg-gray-800 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]" : ""
+            ].join(" ")}
             onClick={send}
             disabled={!canSend}
           >

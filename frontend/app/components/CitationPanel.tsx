@@ -7,7 +7,7 @@ import type { Source } from "./types";
 
 export default function CitationPanel({ sources }: { sources: Source[] }) {
   return (
-    <aside className="h-full border-l bg-background">
+    <aside className="panel-enter h-full bg-background animate-in fade-in duration-300">
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div>
           <div className="text-sm font-semibold">Sources</div>
@@ -28,7 +28,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
           </div>
         ) : (
           sources.map((s, idx) => (
-            <div key={idx} className="rounded-md border p-5 transition-all duration-200 hover:shadow-xl hover:bg-accent hover:-translate-y-1 hover:border-primary/40 cursor-pointer">
+            <div key={idx} className="rounded-md border p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-medium">
   {(() => {

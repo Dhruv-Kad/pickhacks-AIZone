@@ -70,20 +70,6 @@ export default function Page() {
   );
 
 
-useEffect(() => {
-  setSources([
-    {
-      filename: "test.pdf",
-      page: 1,
-      relevance_score: 0.9,
-      chunk_preview: "preview...",
-      pdfUrl: "/some-test.pdf",
-    },
-  ]);
-}, []);
-
-
-
-
+  
 }
 

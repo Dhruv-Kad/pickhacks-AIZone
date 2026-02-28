@@ -12,9 +12,9 @@
 /* Optional dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111827;
+    --background: #43774a;
     --foreground: #f3f4f6;
-    --card: #1f2937;
+    --card: #343541;
     --border: #374151;
     --focus: #60a5fa;
   }
@@ -69,4 +69,8 @@ textarea {
 
 .chat-msg-enter {
   animation: chatFadeIn 220ms ease-out both;
+}
+
+.panel-enter {
+  animation: chatFadeIn 300ms ease-out both;
 } 
