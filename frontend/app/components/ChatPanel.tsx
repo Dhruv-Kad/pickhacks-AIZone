@@ -4,6 +4,8 @@ import { useMemo, useRef, useState } from "react";
 import type { ChatMessage, Source } from "./types";
 import { sendChat } from "../lib/api";
 
+const bubbleDelayMs = 1000; // 500–2000
+
 export default function ChatPanel(props: {
   selectedDocId: string | null;
   onSources: (sources: Source[]) => void;
@@ -31,46 +33,93 @@ export default function ChatPanel(props: {
     [input, loading]
   );
 
-  async function send() {
-    if (!canSend) return;
+async function send() {
+  if (!canSend) return;
 
-    const question = input.trim();
-    setInput("");
-    setLoading(true);
+  const question = input.trim();
+  setInput("");
 
-    // immediately show the user's message
-    setMessages((prev) => [...prev, { role: "user", content: question }]);
+  // show user message immediately
+  setMessages((prev) => [...prev, { role: "user", content: question }]);
 
-    try {
-      const data = await sendChat(question, selectedDocId ?? undefined);
+  setLoading(true);
 
-      // longer delay so assistant response isn't immediate
-      await new Promise((r) => setTimeout(r, 1200));
+  // unique id for this assistant response
+  const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-      setMessages((prev) => [
+  // schedule the assistant bubble to APPEAR after delay (placeholder)
+  const bubbleTimer = setTimeout(() => {
+    setMessages((prev) => {
+      // if it already exists (edge case), don't add twice
+      if (prev.some((m: any) => m._id === id)) return prev;
+
+      return [
         ...prev,
-        { role: "assistant", content: data.answer },
-      ]);
-      onSources(data.sources ?? []);
-    } catch {
-      await new Promise((r) => setTimeout(r, 1200));
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Couldn't reach the API. Make sure the FastAPI backend is running on port 8000.",
-        },
-      ]);
-      onSources([]);
-    } finally {
-      setLoading(false);
-      setTimeout(
-        () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
-        50
+        { role: "assistant", content: "Thinking…", _id: id, _pending: true } as any,
+      ];
+    });
+  }, bubbleDelayMs);
+
+  try {
+    const data = await sendChat(question, selectedDocId ?? undefined);
+
+    // ensure placeholder exists (if API returned before delay)
+    clearTimeout(bubbleTimer);
+    setMessages((prev) => {
+      const exists = prev.some((m: any) => m._id === id);
+      if (!exists) {
+        return [
+          ...prev,
+          { role: "assistant", content: "…", _id: id, _pending: true } as any,
+        ];
+      }
+      return prev;
+    });
+
+    // now fill in the placeholder with the real answer
+    setMessages((prev) =>
+      prev.map((m: any) =>
+        m._id === id
+          ? { role: "assistant", content: data.answer, _id: id, _pending: false }
+          : m
+      )
+    );
+
+    onSources(data.sources ?? []);
+  } catch {
+    clearTimeout(bubbleTimer);
+
+    // ensure placeholder exists, then fill with error
+    setMessages((prev) => {
+      const exists = prev.some((m: any) => m._id === id);
+      const next = exists
+        ? prev
+        : [
+            ...prev,
+            { role: "assistant", content: "…", _id: id, _pending: true } as any,
+          ];
+      return next.map((m: any) =>
+        m._id === id
+          ? {
+              role: "assistant",
+              content:
+                "Couldn't reach the API. Make sure the FastAPI backend is running on port 8000.",
+              _id: id,
+              _pending: false,
+            }
+          : m
       );
-    }
+    });
+
+    onSources([]);
+  } finally {
+    setLoading(false);
+    setTimeout(
+      () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
+      50
+    );
   }
+}
 
   return (
     <section className="flex h-full flex-col">
@@ -95,11 +144,7 @@ export default function ChatPanel(props: {
             {m.content}
           </div>
         ))}
-        {loading && (
-          <div className="chat-msg-enter mr-auto max-w-[85%] rounded-lg border px-3 py-2 text-sm text-muted-foreground animate-pulse">
-            Thinking...
-          </div>
-        )}
+
         <div ref={bottomRef} />
       </div>
 
