@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import uuid
 from pathlib import Path
 
@@ -46,4 +47,11 @@ def ingest_folder():
 
         doc_id = str(uuid.uuid4())
         add_chunks(doc_id, pdf_path.name, chunks, embeddings)
+
+        # Save a copy named by doc_id so the PDF viewer endpoint can find it
+        id_pdf_path = folder / f"{doc_id}.pdf"
+        if not id_pdf_path.exists():
+            import shutil
+            shutil.copy2(pdf_path, id_pdf_path)
+
         logger.info("Ingested '%s': %d chunks.", pdf_path.name, len(chunks))
