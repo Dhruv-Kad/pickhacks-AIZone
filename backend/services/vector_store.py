@@ -99,3 +99,11 @@ def list_documents() -> list[dict]:
 def get_ingested_filenames() -> set[str]:
     """Return the set of filenames already stored in ChromaDB."""
     return {meta["filename"] for meta in _doc_metadata.values()}
+
+
+def get_doc_id_by_filename(filename: str) -> str | None:
+    """Return the document ID for a given filename, or None if not found."""
+    for doc_id, meta in _doc_metadata.items():
+        if meta["filename"] == filename:
+            return doc_id
+    return None
