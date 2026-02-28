@@ -52,4 +52,4 @@ def ingest_folder():
         add_chunks(doc_id, pdf_path.name, chunks, embeddings)
 
         logger.info("Ingested '%s': %d chunks.", pdf_path.name, len(chunks))
-        deletebadfiles(badguylist)
+        #deletebadfiles(badguylist)
