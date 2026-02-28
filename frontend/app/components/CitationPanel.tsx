@@ -1,45 +1,44 @@
 "use client";
 
-import type { Citation } from "./types";
+import type { Source } from "./types";
 
-export default function CitationPanel({ citations }: { citations: Citation[] }) {
+export default function CitationPanel({ sources }: { sources: Source[] }) {
   return (
     <aside className="h-full border-l bg-background">
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div>
-          <div className="text-sm font-semibold">Citations</div>
+          <div className="text-sm font-semibold">Sources</div>
           <div className="text-xs text-muted-foreground">
-            Evidence from St. Louis County sources
+            Retrieved from your PDFs
           </div>
         </div>
         <div className="text-xs text-muted-foreground">
-          {citations.length} item{citations.length === 1 ? "" : "s"}
+          {sources.length} source{sources.length === 1 ? "" : "s"}
         </div>
       </div>
 
-      <div className="space-y-3 p-4">
-        {citations.length === 0 ? (
+      <div className="space-y-3 overflow-auto p-4">
+        {sources.length === 0 ? (
           <div className="rounded-md border p-3 text-sm text-muted-foreground">
-            No citations yet. Ask a question to populate this panel.
+            No sources yet. Ask a question to see relevant passages from your
+            documents.
           </div>
         ) : (
-          citations.map((c) => (
-            <div key={c.id} className="rounded-md border p-3">
+          sources.map((s, idx) => (
+            <div key={idx} className="rounded-md border p-3">
               <div className="flex items-start justify-between gap-3">
-                <div className="text-sm font-medium">{c.title}</div>
-                {c.url ? (
-                  <a
-                    className="text-xs underline"
-                    href={c.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    open
-                  </a>
-                ) : null}
+                <div className="text-sm font-medium">{s.filename}</div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">
+                    p. {s.page}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {Math.round(s.relevance_score * 100)}%
+                  </span>
+                </div>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
-                {c.snippet}
+              <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
+                {s.chunk_preview}
               </p>
             </div>
           ))

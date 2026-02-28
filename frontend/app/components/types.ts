@@ -1,29 +1,35 @@
-export type Jurisdiction = "stl_county";
-
-export type PermitType = "fence" | "shed" | "treehouse";
-
-export type Citation = {
-  id: string;
-  title: string;
-  snippet: string;
-  url?: string;
-};
-
 export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
 };
 
-export type AskRequest = {
-  jurisdiction: Jurisdiction; // always "stl_county"
-  permitType: PermitType;
-  question: string;
-  state?: Record<string, unknown>;
+export type Source = {
+  filename: string;
+  page: number;
+  chunk_preview: string;
+  relevance_score: number;
 };
 
-export type AskResponse = {
+export type DocumentInfo = {
+  id: string;
+  filename: string;
+  num_chunks: number;
+  uploaded_at: string;
+};
+
+export type ChatRequest = {
+  query: string;
+  document_id?: string;
+};
+
+export type ChatResponse = {
   answer: string;
-  citations: Citation[];
-  nextQuestions?: { id: string; label: string; type: "text" | "yesno" }[];
-  packetJson?: Record<string, unknown> | null;
+  sources: Source[];
+};
+
+export type UploadResponse = {
+  id: string;
+  filename: string;
+  num_chunks: number;
+  message: string;
 };

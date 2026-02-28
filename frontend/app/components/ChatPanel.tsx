@@ -1,23 +1,24 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import type { AskResponse, ChatMessage, Citation, PermitType } from "./types";
+import type { ChatMessage, Source } from "./types";
+import { sendChat } from "../lib/api";
 
 export default function ChatPanel(props: {
-  permitType: PermitType;
-  onCitations: (citations: Citation[]) => void;
+  selectedDocId: string | null;
+  onSources: (sources: Source[]) => void;
 }) {
-  const { permitType, onCitations } = props;
+  const { selectedDocId, onSources } = props;
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
-        "Ask a St. Louis County question like:\n" +
-        "• “Can I build a 6ft fence?”\n" +
-        "• “Do I need a permit for a shed?”\n" +
-        "• “Can I build a treehouse in my backyard?”\n\n" +
-        "I’ll answer with citations once the RAG backend is wired.",
+        "Upload a PDF and ask me anything about it.\n\n" +
+        "Examples:\n" +
+        '- "What is this document about?"\n' +
+        '- "Summarize the key findings"\n' +
+        '- "What does section 3 say about...?"',
     },
   ]);
 
@@ -25,7 +26,10 @@ export default function ChatPanel(props: {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const canSend = useMemo(() => input.trim().length > 0 && !loading, [input, loading]);
+  const canSend = useMemo(
+    () => input.trim().length > 0 && !loading,
+    [input, loading]
+  );
 
   async function send() {
     if (!canSend) return;
@@ -37,46 +41,38 @@ export default function ChatPanel(props: {
     setMessages((prev) => [...prev, { role: "user", content: question }]);
 
     try {
-      const res = await fetch("/api/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jurisdiction: "stl_county",
-          permitType,
-          question,
-          state: {},
-        }),
-      });
+      const data = await sendChat(question, selectedDocId ?? undefined);
 
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-      const data = (await res.json()) as AskResponse;
-
-      setMessages((prev) => [...prev, { role: "assistant", content: data.answer }]);
-      onCitations(data.citations ?? []);
-    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.answer },
+      ]);
+      onSources(data.sources ?? []);
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
           content:
-            "Couldn’t reach the API. If you haven’t created /api/ask yet, add a stub route.\n\n(Once FastAPI is connected, this will work.)",
+            "Couldn't reach the API. Make sure the FastAPI backend is running on port 8000.",
         },
       ]);
-      onCitations([]);
+      onSources([]);
     } finally {
       setLoading(false);
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+      setTimeout(
+        () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
+        50
+      );
     }
   }
 
   return (
     <section className="flex h-full flex-col">
       <div className="border-b px-4 py-3">
-        <div className="text-sm font-semibold">Assistant</div>
+        <div className="text-sm font-semibold">Chat</div>
         <div className="text-xs text-muted-foreground">
-          Jurisdiction: <span className="font-medium">St. Louis County</span> · Build type:{" "}
-          <span className="font-medium">{permitType}</span>
+          Ask questions about your uploaded PDFs
         </div>
       </div>
 
@@ -94,6 +90,11 @@ export default function ChatPanel(props: {
             {m.content}
           </div>
         ))}
+        {loading && (
+          <div className="mr-auto max-w-[85%] rounded-lg border px-3 py-2 text-sm text-muted-foreground animate-pulse">
+            Thinking...
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
@@ -101,7 +102,7 @@ export default function ChatPanel(props: {
         <div className="flex gap-2">
           <input
             className="h-11 flex-1 rounded-md border bg-background px-3 text-sm outline-none"
-            placeholder="Ask a permit question…"
+            placeholder="Ask a question about your documents..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -114,12 +115,8 @@ export default function ChatPanel(props: {
             onClick={send}
             disabled={!canSend}
           >
-            {loading ? "Sending…" : "Send"}
+            Send
           </button>
-        </div>
-
-        <div className="mt-2 text-xs text-muted-foreground">
-          Right now this hits <code>/api/ask</code> (stub). Later you’ll connect it to FastAPI + RAG.
         </div>
       </div>
     </section>
