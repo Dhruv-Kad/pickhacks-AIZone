@@ -1,7 +1,7 @@
 import os
 from services.ingest_service import ingest_folder
 from services.scraper_service import ai_query_web
-from services.vector_store import _rebuild_doc_metadata
+
 from google import genai
 from google.genai import types
 
@@ -23,7 +23,7 @@ def downloaddoc(query: str):
     """Search the web for relevant PDF documents and download them."""
     ai_query_web(query, "./pdfs")
     ingest_folder()
-    impser.rebuild_doc_metadata()
+
     
 
 downloaddoc_declaration = types.FunctionDeclaration(
@@ -107,7 +107,7 @@ Question: {query}
 Answer based on the context above:"""
 
     response = client.models.generate_content(
-        model="gemini-1.5-flash-lite",
+        model="gemini-3.1-pro-preview",
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
