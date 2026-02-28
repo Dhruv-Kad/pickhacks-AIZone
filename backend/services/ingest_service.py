@@ -37,6 +37,7 @@ def ingest_folder():
         pages = extract_text(file_bytes, pdf_path.name)
         if not pages:
             logger.warning("Could not extract text from '%s', skipping.", pdf_path.name)
+            os.remove("../pdfs/" + pdf_path.name)
             continue
 
         chunks = chunk_text(pages)

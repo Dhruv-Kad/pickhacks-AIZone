@@ -23,7 +23,6 @@ def downloaddoc(query: str):
     """Search the web for relevant PDF documents and download them."""
     ai_query_web(query, "./pdfs")
     ingest_folder()
-
     
 
 downloaddoc_declaration = types.FunctionDeclaration(
