@@ -21,10 +21,10 @@ export default function ChatPanel(props: {
     {
       role: "assistant",
       content:
-        "If you reading this, you is a bitch.\n\n" +
+        "Ask about if you are able to build on certain land.\n\n" +
         "Examples:\n" +
-        '- "PP SUCKER?"\n' +
-        '- "Summarize the key findings"\n' +
+        '- "Can I build a fence here?"\n' +
+        '- "Summarize the key findings."\n' +
         '- "What does section 3 say about...?"',
     },
   ]);
