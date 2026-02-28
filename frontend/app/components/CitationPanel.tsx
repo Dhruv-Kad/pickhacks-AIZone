@@ -12,10 +12,10 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
         <div>
           <div className="text-sm font-semibold">Sources</div>
           <div className="text-xs text-muted-foreground">
-            Retrieved from your PDFs
+            Relevent PDFs
           </div>
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground font-semibold">
           {sources.length} source{sources.length === 1 ? "" : "s"}
         </div>
       </div>
@@ -30,7 +30,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
           sources.map((s, idx) => (
             <div key={idx} className="rounded-md border border-zinc-200 bg-blue-300 text-black p-3 font-semibold">
               <div className="flex items-start justify-between gap-3">
-                <div className="text-sm font-medium">
+                <div className="text-sm font-bold">
   {(() => {
     const href =
       s.pdfUrl
@@ -53,7 +53,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
     );
   })()}
 </div>
-                <div className="rounded bg-white flex shrink-0 items-center gap-2">
+                <div className="rounded bg-white sflex shrink-0 items-center gap-2">
                   <span className="text-xs text-muted-foreground">
                     Relevance = {Math.round(s.relevance_score * 100)}%
                   </span>
