@@ -29,15 +29,3 @@ def download_pdf(url, folder):
     except Exception as e:
         print(f"Failed to download {url}: {e}")
 
-def ai_query_web(q, fold):
-    linklist = get_pdf_links(q)
-    download_pdf(linklist[0], fold)
-
-if __name__ == "__main__":
-    user_input = input("PDF Finder: ")
-    links = get_pdf_links(user_input)
-    
-    download_pdf(links[0], SAVE_FOLDER)
-    
-
-

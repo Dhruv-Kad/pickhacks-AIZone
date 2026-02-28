@@ -5,3 +5,4 @@ google-genai>=1.0.0
 chromadb>=0.6.0
 pymupdf>=1.25.0
 python-dotenv>=1.0.0
+langchain-openai>=0.0.5
