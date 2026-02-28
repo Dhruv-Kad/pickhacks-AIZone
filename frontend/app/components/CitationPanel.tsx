@@ -55,7 +55,6 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="rounded bg-white px-1.5 py-0.5 text-xs text-black">
-                    pg. {s.page}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     Relevance = {Math.round(s.relevance_score * 100)}%
