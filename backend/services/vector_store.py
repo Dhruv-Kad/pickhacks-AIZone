@@ -19,10 +19,10 @@ def init_chroma():
         name=COLLECTION_NAME,
         metadata={"hnsw:space": "cosine"},
     )
-    _rebuild_doc_metadata()
+    rebuild_doc_metadata()
 
 
-def _rebuild_doc_metadata():
+def rebuild_doc_metadata():
     """Reconstruct document metadata from ChromaDB on startup."""
     all_data = _collection.get(include=["metadatas"])
     seen: dict[str, dict] = {}
