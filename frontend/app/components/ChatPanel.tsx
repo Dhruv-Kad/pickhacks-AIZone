@@ -130,9 +130,9 @@ async function send() {
     // add a shadow so the chat panel stands out
     <section className="flex h-full flex-col rounded-2xl shadow-xl shadow-black/20 overflow-hidden">
       <div className="border-b px-4 py-3">
-        <div className="text-sm font-semibold">Chat</div>
+        <div className="text-sm font-semibold">Constructor Advisor</div>
         <div className="text-xs text-muted-foreground">
-          Ask questions about your uploaded PDFs
+          Ask questions about construction legality in your area
         </div>
       </div>
 
@@ -152,7 +152,7 @@ async function send() {
               "h-11 flex-1 rounded-md border bg-background px-3 text-sm outline-none",
               inputClassName ?? "",
             ].join(" ")}
-            placeholder="Ask a question about your documents..."
+            placeholder="Ex: Can I build a fence at Rolla, Missouri?"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
