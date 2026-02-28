@@ -38,22 +38,22 @@ export default function ChatPanel(props: {
     setInput("");
     setLoading(true);
 
+    // immediately show the user's message
     setMessages((prev) => [...prev, { role: "user", content: question }]);
 
     try {
       const data = await sendChat(question, selectedDocId ?? undefined);
 
+      // longer delay so assistant response isn't immediate
+      await new Promise((r) => setTimeout(r, 1200));
+
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.answer },
       ]);
-      onSources(
-  (data.sources ?? []).map((s: any) => ({
-    ...s,
-    docId: s.docId ?? s.document_id ?? selectedDocId ?? undefined,
-  }))
-);
+      onSources(data.sources ?? []);
     } catch {
+      await new Promise((r) => setTimeout(r, 1200));
       setMessages((prev) => [
         ...prev,
         {
@@ -86,7 +86,7 @@ export default function ChatPanel(props: {
           <div
             key={idx}
             className={[
-              "max-w-[85%] whitespace-pre-wrap rounded-lg border px-3 py-2 text-sm",
+              "chat-msg-enter max-w-[85%] whitespace-pre-wrap rounded-lg border px-3 py-2 text-sm",
               m.role === "user"
                 ? "ml-auto bg-black text-white"
                 : "mr-auto bg-background",
@@ -96,7 +96,7 @@ export default function ChatPanel(props: {
           </div>
         ))}
         {loading && (
-          <div className="mr-auto max-w-[85%] rounded-lg border px-3 py-2 text-sm text-muted-foreground animate-pulse">
+          <div className="chat-msg-enter mr-auto max-w-[85%] rounded-lg border px-3 py-2 text-sm text-muted-foreground animate-pulse">
             Thinking...
           </div>
         )}
