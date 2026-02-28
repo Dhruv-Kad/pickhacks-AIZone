@@ -1,6 +1,9 @@
 import uuid
+import os
+from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 
 from models.schemas import DeleteResponse, DocumentListResponse, UploadResponse
 from services.embedding_service import embed_texts
@@ -36,6 +39,12 @@ async def upload_pdf(file: UploadFile = File(...)):
     # Store in ChromaDB
     doc_id = str(uuid.uuid4())
     add_chunks(doc_id, file.filename, chunks, embeddings)
+    
+    # Save PDF to disk
+    pdfs_dir = Path(os.environ.get("PDF_STORAGE_DIR", "./pdfs"))
+    pdfs_dir.mkdir(parents=True, exist_ok=True)
+    pdf_path = pdfs_dir / f"{doc_id}.pdf"
+    pdf_path.write_bytes(file_bytes)
 
     return UploadResponse(
         id=doc_id,
@@ -55,3 +64,19 @@ async def get_documents():
 async def remove_document(doc_id: str):
     delete_document(doc_id)
     return DeleteResponse(message=f"Document {doc_id} deleted")
+
+
+@router.get("/{doc_id}/file")
+async def get_pdf_file(doc_id: str):
+    """Serve the PDF file for a given document ID."""
+    pdfs_dir = Path(os.environ.get("PDF_STORAGE_DIR", "./pdfs"))
+    pdf_path = pdfs_dir / f"{doc_id}.pdf"
+    
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="PDF file not found")
+    
+    return FileResponse(
+        pdf_path, 
+        media_type="application/pdf",
+        filename=f"{doc_id}.pdf"
+    )

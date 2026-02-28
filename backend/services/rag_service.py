@@ -57,6 +57,7 @@ def generate_answer(query: str, document_id: str | None = None) -> dict:
                     doc_text[:200] + "..." if len(doc_text) > 200 else doc_text
                 ),
                 "relevance_score": round(1 - dist, 4),
+                "docId": meta["document_id"],
             }
         )
 
