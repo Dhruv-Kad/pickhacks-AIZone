@@ -46,7 +46,9 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
         rel="noreferrer"
         className="underline underline-offset-4 hover:opacity-80"
       >
-        {s.filename}
+          {s.filename.length > 15
+    ? s.filename.slice(0, 15) + "..."
+    : s.filename}
       </a>
     ) : (
       <span>{s.filename}</span>
