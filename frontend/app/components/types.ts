@@ -37,3 +37,10 @@ export type UploadResponse = {
   num_chunks: number;
   message: string;
 };
+
+export type PdfViewerState = {
+  isOpen: boolean;
+  pdfUrl: string;
+  initialPage: number;
+  filename: string;
+};
