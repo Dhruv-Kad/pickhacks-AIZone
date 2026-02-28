@@ -58,7 +58,7 @@ export default function TopBar({
           <div className="leading-tight">
             <div className="text-sm font-semibold"></div>
             <div className="text-xs text-muted-foreground">
-              PDF Knowledge Assistant
+              DSKT 18 - PickHax Hackathon 2026
             </div>
           </div>
         </div>
