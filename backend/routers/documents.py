@@ -86,5 +86,4 @@ async def get_pdf_file(doc_id: str):
     return FileResponse(
         pdf_path,
         media_type="application/pdf",
-        filename=pdf_path.name
     )
