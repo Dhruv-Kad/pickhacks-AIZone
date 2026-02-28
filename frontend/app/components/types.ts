@@ -6,8 +6,12 @@ export type ChatMessage = {
 export type Source = {
   filename: string;
   page: number;
-  chunk_preview: string;
   relevance_score: number;
+  chunk_preview: string;
+
+  // add these (optional for now)
+  docId?: string;
+  pdfUrl?: string;
 };
 
 export type DocumentInfo = {
