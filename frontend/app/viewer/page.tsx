@@ -13,24 +13,19 @@ function ViewerContent() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white-100">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="border-b bg-white px-4 py-4 shadow-sm">
+        <div className="border-b bg-gray px-4 py-4 shadow-sm">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">PDF Viewer</h1>
             <button
               onClick={() => window.close()}
-              className="rounded bg-gray-300 px-3 py-1 text-sm hover:bg-gray-400"
+              className="rounded bg-blue-300 px-3 py-1 text-sm hover:bg-gray-400"
             >
               Close
             </button>
           </div>
-          {page && (
-            <p className="mt-2 text-sm text-gray-600">
-              Page: <span className="font-semibold">{page}</span>
-            </p>
-          )}
         </div>
 
         {/* PDF Viewer */}
