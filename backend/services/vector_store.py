@@ -94,3 +94,8 @@ def delete_document(doc_id: str):
 def list_documents() -> list[dict]:
     """List all uploaded documents."""
     return [{"id": doc_id, **meta} for doc_id, meta in _doc_metadata.items()]
+
+
+def get_ingested_filenames() -> set[str]:
+    """Return the set of filenames already stored in ChromaDB."""
+    return {meta["filename"] for meta in _doc_metadata.values()}
