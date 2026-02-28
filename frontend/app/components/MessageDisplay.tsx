@@ -14,8 +14,8 @@ export function MessageDisplay({ message }: { message: ChatMessage }) {
       className={[
         "chat-msg-enter max-w-[85%] whitespace-pre-wrap rounded-lg border px-3 py-2 text-sm",
         message.role === "user"
-          ? "ml-auto border-blue-400 bg-blue-500 text-white"
-          : "mr-auto border-gray-300 bg-gray-300 text-gray-800",
+          ? "ml-auto border-blue-500 bg-blue-600 text-white"
+          : "mr-auto border-gray-200 bg-gray-100 text-gray-800",
       ].join(" ")}
     >
       <ReactMarkdown
@@ -28,11 +28,11 @@ export function MessageDisplay({ message }: { message: ChatMessage }) {
     code: ({ children, className }) => {
       const isInline = !className?.includes('language-');
       return isInline ? (
-        <code className="rounded bg-black/10 px-1 py-0.5 text-sm">
+        <code className="rounded bg-gray-200 px-1 py-0.5 text-sm">
           {children}
         </code>
       ) : (
-        <pre className="rounded bg-black text-white p-3 overflow-x-auto text-sm">
+        <pre className="rounded bg-gray-900 text-gray-100 p-3 overflow-x-auto text-sm">
           <code className={className}>{children}</code>
         </pre>
       );

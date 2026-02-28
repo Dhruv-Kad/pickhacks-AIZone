@@ -9,16 +9,6 @@
   --focus: #2563eb;           /* strong accessible blue */
 }
 
-/* Optional dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #43774a;
-    --foreground: #f3f4f6;
-    --card: #343541;
-    --border: #374151;
-    --focus: #60a5fa;
-  }
-}
 
 /* ===== Base Typography ===== */
 body {

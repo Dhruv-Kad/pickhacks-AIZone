@@ -131,7 +131,7 @@ async function send() {
     <section className="flex h-full flex-col rounded-2xl shadow-xl shadow-black/20 overflow-hidden">
       <div className="border-b px-4 py-3">
         <div className="text-sm font-semibold">Constructor Advisor</div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-gray-500">
           Ask questions about construction legality in your area
         </div>
       </div>
@@ -162,8 +162,8 @@ async function send() {
           />
           <button
             className={[
-              "h-11 rounded-md bg-black px-4 text-sm font-semibold text-white disabled:opacity-50 transition-all",
-              canSend ? "hover:bg-gray-800 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]" : ""
+              "h-11 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white disabled:opacity-50 transition-all",
+              canSend ? "hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]" : ""
             ].join(" ")}
             onClick={send}
             disabled={!canSend}

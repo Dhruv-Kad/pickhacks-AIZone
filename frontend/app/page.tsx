@@ -51,7 +51,7 @@ export default function Page() {
           <h2 className="text-lg font-semibold">PDF Viewer</h2>
           <button
             onClick={() => setViewingPdf(null)}
-            className="rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
+            className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
           >
             Close
           </button>

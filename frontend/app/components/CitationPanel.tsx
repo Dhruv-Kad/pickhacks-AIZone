@@ -11,24 +11,24 @@ export default function CitationPanel({ sources, onViewPdf }: { sources: Source[
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div>
           <div className="text-sm font-semibold">Sources</div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-gray-500">
             Relevent PDFs
           </div>
         </div>
-        <div className="text-xs text-muted-foreground font-semibold">
+        <div className="text-xs text-gray-500 font-semibold">
           {sources.length} source{sources.length === 1 ? "" : "s"}
         </div>
       </div>
 
       <div className="space-y-3 overflow-auto p-4">
         {sources.length === 0 ? (
-          <div className="rounded-md border p-3 text-sm text-muted-foreground">
+          <div className="rounded-md border p-3 text-sm text-gray-500">
             No sources yet. Ask a question to see relevant passages from your
             documents.
           </div>
         ) : (
           sources.map((s, idx) => (
-            <div key={idx} className="rounded-md border border-zinc-200 bg-blue-300 text-black p-3 font-semibold">
+            <div key={idx} className="rounded-md border border-gray-200 bg-gray-50 text-gray-800 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-bold">
   {(() => {
@@ -58,13 +58,13 @@ export default function CitationPanel({ sources, onViewPdf }: { sources: Source[
     );
   })()}
 </div>
-                <div className="rounded bg-white sflex shrink-0 items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
+                <div className="rounded bg-white flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-gray-500">
                   Relevance: {Math.round(s.relevance_score * 100)}%
                   </span>
                 </div>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
+              <p className="mt-2 whitespace-pre-wrap text-xs text-gray-500 leading-relaxed">
                 {s.chunk_preview}
               </p>
             </div>

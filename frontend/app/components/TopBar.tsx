@@ -48,16 +48,16 @@ export default function TopBar({
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b bg-slate-800 text-white">
+    <header className="sticky top-0 z-10 border-b bg-gray-800 text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white text-xs font-bold">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white text-xs font-bold">
             AI
           </div>
 
           <div className="leading-tight">
             <div className="text-sm font-semibold"></div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-gray-400">
               DSKT 18 - PickHax Hackathon 2026
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function TopBar({
           href="https://github.com/Dhruv-Kad/pickhacks-AIZone"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium hover:text-slate-300 transition-colors"
+          className="text-sm font-medium hover:text-gray-300 transition-colors"
         >
           GitHub
         </a>
