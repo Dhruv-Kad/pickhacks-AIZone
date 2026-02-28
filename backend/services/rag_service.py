@@ -1,9 +1,12 @@
 import os
+from services.ingest_service import ingest_folder
 from services.scraper_service import ai_query_web
 from google import genai
+from google.genai import types
 
 from services.embedding_service import embed_query
 from services.vector_store import query_chunks
+from services.ingest_service import ingest_folder
 
 _client = None
 
@@ -11,10 +14,31 @@ SYSTEM_PROMPT = (
     "You are a helpful assistant that answers questions based on the provided "
     "context from PDF documents. Use ONLY the provided context to answer the "
     "question. If the context doesn't contain enough information to answer, "
-    "run downloaddoc(query). Always cite which document and page the information came from."
+    "call the downloaddoc tool with the query to search for and download relevant PDFs. "
+    "Always cite which document and page the information came from."
 )
-def downloaddoc(query: str, folder='../pdfs'):
-    ai_query_web(query, folder)
+
+def downloaddoc(query: str):
+    """Search the web for relevant PDF documents and download them."""
+    ai_query_web(query, "./pdfs")
+    ingest_folder()
+
+downloaddoc_declaration = types.FunctionDeclaration(
+    name="downloaddoc",
+    description="Search the web for relevant PDF documents and download them. Call this when the provided context doesn't contain enough information to answer the user's question. However, use this only as a last resort.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "query": types.Schema(
+                type=types.Type.STRING,
+                description="The search query to find relevant PDF documents on the web.",
+            ),
+        },
+        required=["query"],
+    ),
+)
+
+downloaddoc_tool = types.Tool(function_declarations=[downloaddoc_declaration])
 
 
 def _get_client():
@@ -37,13 +61,12 @@ def generate_answer(query: str, document_id: str | None = None) -> dict:
     distances = results["distances"][0] if results["distances"] else []
 
     if not documents:
-        ai_query_web(query,"../pdfs")
-        generate_answer(query,document_id)
+        ingest_folder()
 
-       # return {
-       #     "answer": "No relevant information found in the uploaded documents.",
-       #     "sources": [],
-       # }
+        return {
+            "answer": "No relevant information found in the uploaded documents.",
+            "sources": [],
+        }
 
     # 3. Build context string from retrieved chunks
     context_parts = []
@@ -83,7 +106,20 @@ Answer based on the context above:"""
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
-        config={"system_instruction": SYSTEM_PROMPT},
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            tools=[downloaddoc_tool],
+        ),
     )
+
+    # Check if Gemini wants to call the downloaddoc tool
+    if response.candidates and response.candidates[0].content.parts:
+        for part in response.candidates[0].content.parts:
+            if part.function_call and part.function_call.name == "downloaddoc":
+                args = part.function_call.args
+                search_query = args.get("query", query)
+                downloaddoc(search_query)
+                # Re-run RAG pipeline with newly ingested documents
+                return generate_answer(query, document_id)
 
     return {"answer": response.text, "sources": sources}

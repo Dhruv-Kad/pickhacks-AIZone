@@ -14,19 +14,23 @@ def _get_client():
 
 
 def embed_texts(
-    texts: list[str], task_type: str = "RETRIEVAL_DOCUMENT"
+    texts: list[str], task_type: str = "RETRIEVAL_DOCUMENT", batch_size: int = 100
 ) -> list[list[float]]:
     """Embed a list of texts using Gemini embedding model."""
     client = _get_client()
-    result = client.models.embed_content(
-        model="gemini-embedding-001",
-        contents=texts,
-        config=types.EmbedContentConfig(
-            task_type=task_type,
-            output_dimensionality=768,
-        ),
-    )
-    return [e.values for e in result.embeddings]
+    all_embeddings = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i : i + batch_size]
+        result = client.models.embed_content(
+            model="gemini-embedding-001",
+            contents=batch,
+            config=types.EmbedContentConfig(
+                task_type=task_type,
+                output_dimensionality=768,
+            ),
+        )
+        all_embeddings.extend(e.values for e in result.embeddings)
+    return all_embeddings
 
 
 def embed_query(query: str) -> list[float]:
