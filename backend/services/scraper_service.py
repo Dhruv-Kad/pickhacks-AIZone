@@ -38,8 +38,7 @@ if __name__ == "__main__":
     user_input = input("PDF Finder: ")
     links = get_pdf_links(user_input)
     
-    for link in links:
-        download_pdf(link, SAVE_FOLDER)
+    download_pdf(links[0], SAVE_FOLDER)
     
 
 
