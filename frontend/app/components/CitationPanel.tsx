@@ -46,7 +46,15 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
         rel="noreferrer"
         className="underline underline-offset-4 hover:opacity-80"
       >
-          {s.filename.length > 15 ? "..." : ".pdf"}
+          {(() => {
+  const baseName = s.filename.replace(/\.pdf$/i, ""); // remove existing .png if present
+
+  if (baseName.length > 15) {
+    return baseName.slice(0, 15) + "....pdf";
+  }
+
+  return baseName + ".pdf";
+})()}
       </a>
     ) : (
       <span>{s.filename}</span>
