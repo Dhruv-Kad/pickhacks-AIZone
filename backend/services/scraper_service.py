@@ -31,8 +31,7 @@ def download_pdf(url, folder):
 
 def ai_query_web(q, fold):
     linklist = get_pdf_links(q)
-    for link in linklist:
-        download_pdf(link, fold)
+    download_pdf(linklist[0], fold)
 
 if __name__ == "__main__":
     user_input = input("PDF Finder: ")
