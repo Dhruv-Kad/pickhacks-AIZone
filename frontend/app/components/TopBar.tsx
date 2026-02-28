@@ -63,7 +63,14 @@ export default function TopBar({
           </div>
         </div>
 
-
+        <a
+          href="https://github.com/Dhruv-Kad/pickhacks-AIZone"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium hover:text-slate-300 transition-colors"
+        >
+          GitHub
+        </a>
       </div>
     </header>
   );
