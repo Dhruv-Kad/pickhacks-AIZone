@@ -10,8 +10,12 @@ from services.vector_store import add_chunks, get_ingested_filenames
 
 logger = logging.getLogger(__name__)
 
+def deletebadfiles(removelist):
+    for i in removelist:
+        os.remove("../pdfs/" + i.name)
 
 def ingest_folder():
+    badguylist = []
     """Scan PDF_INGEST_DIR and ingest any PDFs not already in ChromaDB."""
     ingest_dir = os.environ.get("PDF_INGEST_DIR", "./pdfs")
 
@@ -30,6 +34,7 @@ def ingest_folder():
     for pdf_path in pdf_files:
         if pdf_path.name in already_ingested:
             logger.info("Skipping '%s' (already ingested).", pdf_path.name)
+            badguylist.append(pdf_path)
             continue
 
         logger.info("Ingesting '%s'...", pdf_path.name)
@@ -38,7 +43,6 @@ def ingest_folder():
         pages = extract_text(file_bytes, pdf_path.name)
         if not pages:
             logger.warning("Could not extract text from '%s', skipping.", pdf_path.name)
-            os.remove("../pdfs/" + pdf_path.name)
             continue
 
         chunks = chunk_text(pages)
@@ -55,3 +59,4 @@ def ingest_folder():
             shutil.copy2(pdf_path, id_pdf_path)
 
         logger.info("Ingested '%s': %d chunks.", pdf_path.name, len(chunks))
+        deletebadfiles(badguylist)
