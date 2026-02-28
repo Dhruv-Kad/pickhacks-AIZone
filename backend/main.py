@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import chat, documents
+from services.ingest_service import ingest_folder
 from services.vector_store import init_chroma
 
 load_dotenv()
@@ -13,6 +14,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_chroma()
+    ingest_folder()
     yield
 
 
