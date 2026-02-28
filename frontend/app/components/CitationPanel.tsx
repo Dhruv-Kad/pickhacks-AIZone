@@ -24,24 +24,50 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
             documents.
           </div>
         ) : (
-          sources.map((s, idx) => (
-            <div key={idx} className="rounded-md border p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="text-sm font-medium">{s.filename}</div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">
-                    p. {s.page}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {Math.round(s.relevance_score * 100)}%
-                  </span>
+          sources.map((s, idx) => {
+            // Build a URL to open when clicking the citation title
+            const href = s.pdfUrl
+              ? s.page
+                ? `${s.pdfUrl}#page=${s.page}`
+                : s.pdfUrl
+              : s.docId
+                ? `/viewer?docId=${encodeURIComponent(s.docId)}&page=${s.page}`
+                : null;
+
+            return (
+              <div key={idx} className="rounded-md border p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="text-sm font-medium">
+                    {href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline underline-offset-4 hover:opacity-80"
+                      >
+                        {s.filename}
+                      </a>
+                    ) : (
+                      <span>{s.filename}</span>
+                    )}
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">
+                      p. {s.page}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round(s.relevance_score * 100)}%
+                    </span>
+                  </div>
                 </div>
+
+                <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
+                  {s.chunk_preview}
+                </p>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
-                {s.chunk_preview}
-              </p>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </aside>
