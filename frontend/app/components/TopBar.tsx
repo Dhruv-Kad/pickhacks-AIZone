@@ -4,33 +4,44 @@ import { useRef, useState } from "react";
 import type { DocumentInfo } from "./types";
 import { uploadPdf, deleteDocument } from "../lib/api";
 
-export default function TopBar(props: {
+type TopBarProps = {
   documents: DocumentInfo[];
   selectedDocId: string | null;
   setSelectedDocId: (id: string | null) => void;
   onDocumentsChange: () => void;
-}) {
-  const { documents, selectedDocId, setSelectedDocId, onDocumentsChange } = props;
+};
+
+export default function TopBar({
+  documents,
+  selectedDocId,
+  setSelectedDocId,
+  onDocumentsChange,
+}: TopBarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setUploading(true);
     try {
       await uploadPdf(file);
       onDocumentsChange();
     } catch (err) {
-      alert("Upload failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      alert(
+        "Upload failed: " + (err instanceof Error ? err.message : "Unknown error")
+      );
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
+      // clear input so you can re-upload the same file
+      e.target.value = "";
     }
   }
 
   async function handleDelete(docId: string) {
     if (!confirm("Delete this document?")) return;
+
     await deleteDocument(docId);
     if (selectedDocId === docId) setSelectedDocId(null);
     onDocumentsChange();
@@ -43,10 +54,11 @@ export default function TopBar(props: {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white text-xs font-bold">
             AI
           </div>
+
           <div className="leading-tight">
             <div className="text-sm font-semibold">DSTK</div>
             <div className="text-xs text-muted-foreground">
-              
+              PDF Knowledge Assistant
             </div>
           </div>
         </div>
