@@ -1,5 +1,5 @@
 import os
-from scraper_service import ai_query_web
+from services.scraper_service import ai_query_web
 from google import genai
 
 from services.embedding_service import embed_query
