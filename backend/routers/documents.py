@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from models.schemas import DeleteResponse, DocumentListResponse, UploadResponse
 from services.embedding_service import embed_texts
 from services.pdf_service import chunk_text, extract_text
-from services.vector_store import add_chunks, delete_document, list_documents
+from services.vector_store import add_chunks, delete_document, get_doc_id_by_filename, list_documents, _doc_metadata
 
 router = APIRouter()
 
@@ -70,13 +70,21 @@ async def remove_document(doc_id: str):
 async def get_pdf_file(doc_id: str):
     """Serve the PDF file for a given document ID."""
     pdfs_dir = Path(os.environ.get("PDF_STORAGE_DIR", "./pdfs"))
+
+    # Try {doc_id}.pdf first (from upload endpoint)
     pdf_path = pdfs_dir / f"{doc_id}.pdf"
-    
+
+    # Fall back to original filename from the database (from folder ingestion)
+    if not pdf_path.exists():
+        meta = _doc_metadata.get(doc_id)
+        if meta:
+            pdf_path = pdfs_dir / meta["filename"]
+
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="PDF file not found")
-    
+
     return FileResponse(
-        pdf_path, 
+        pdf_path,
         media_type="application/pdf",
-        filename=f"{doc_id}.pdf"
+        filename=pdf_path.name
     )
