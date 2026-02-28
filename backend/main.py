@@ -14,11 +14,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_chroma()
-    try:
-        ingest_folder()
-    except Exception as e:
-        import logging
-        logging.getLogger(__name__).warning("Startup ingestion failed (server will still run): %s", e)
+    ingest_folder()
     yield
 
 

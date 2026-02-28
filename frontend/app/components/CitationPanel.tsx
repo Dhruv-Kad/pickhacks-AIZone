@@ -2,12 +2,10 @@
 
 import type { Source } from "./types";
 
-type Props = {
-  sources: Source[];
-  onOpenPdf: (source: Source) => void;
-};
 
-export default function CitationPanel({ sources, onOpenPdf }: Props) {
+
+
+export default function CitationPanel({ sources }: { sources: Source[] }) {
   return (
     <aside className="panel-enter h-full bg-background animate-in fade-in duration-300">
       <div className="flex items-center justify-between border-b px-4 py-3">
@@ -34,23 +32,30 @@ export default function CitationPanel({ sources, onOpenPdf }: Props) {
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-bold">
   {(() => {
-    const displayName = (() => {
-      const baseName = s.filename.replace(/\.pdf$/i, "");
-      if (baseName.length > 15) {
-        return baseName.slice(0, 15) + "....pdf";
-      }
-      return baseName + ".pdf";
-    })();
+    const href =
+      s.pdfUrl
+        ? (s.page ? `${s.pdfUrl}#page=${s.page}` : s.pdfUrl)
+        : s.docId
+          ? `/viewer?docId=${encodeURIComponent(s.docId)}&page=${s.page}`
+          : null;
 
-    const canOpen = !!(s.pdfUrl || s.docId);
-
-    return canOpen ? (
-      <button
-        onClick={() => onOpenPdf(s)}
-        className="underline underline-offset-4 hover:opacity-80 text-left"
+    return href ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="underline underline-offset-4 hover:opacity-80"
       >
-        {displayName}
-      </button>
+          {(() => {
+  const baseName = s.filename.replace(/\.pdf$/i, ""); // remove existing .png if present
+
+  if (baseName.length > 15) {
+    return baseName.slice(0, 15) + "....pdf";
+  }
+
+  return baseName + ".pdf";
+})()}
+      </a>
     ) : (
       <span>{s.filename}</span>
     );
