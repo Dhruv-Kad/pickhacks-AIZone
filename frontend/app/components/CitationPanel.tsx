@@ -28,7 +28,7 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
           </div>
         ) : (
           sources.map((s, idx) => (
-            <div key={idx} className="rounded-md border p-3">
+            <div key={idx} className="rounded-md border border-zinc-200 bg-black text-white p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm font-medium">
   {(() => {
@@ -54,11 +54,11 @@ export default function CitationPanel({ sources }: { sources: Source[] }) {
   })()}
 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">
-                    p. {s.page}
+                  <span className="rounded bg-black px-1.5 py-0.5 text-xs text-white">
+                    pg. {s.page}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {Math.round(s.relevance_score * 100)}%
+                    Relevance = {Math.round(s.relevance_score * 100)}%
                   </span>
                 </div>
               </div>

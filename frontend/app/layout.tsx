@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PENIS BALLS - PDF Knowledge Assistant",
+  title: "DSKT 18 - PickHax Hackathon 2026",
   description: "Ask questions about zoning laws!",
 };
 
