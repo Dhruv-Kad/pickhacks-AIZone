@@ -6,8 +6,3 @@ chromadb>=0.6.0
 pymupdf>=1.25.0
 python-dotenv>=1.0.0
 langchain-openai>=0.0.5
-pymupdf4llm==0.3.4
-pymupdf==1.27.1
-sentence-transformers==3.3.0
-torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
-langchain>=0.1.0

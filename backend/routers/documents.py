@@ -1,6 +1,5 @@
 import uuid
 import os
-import pymupdf4llm
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -13,6 +12,7 @@ from services.vector_store import add_chunks, delete_document, get_doc_id_by_fil
 
 router = APIRouter()
 
+
 @router.post("/upload", response_model=UploadResponse)
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.lower().endswith(".pdf"):
@@ -22,32 +22,35 @@ async def upload_pdf(file: UploadFile = File(...)):
     if len(file_bytes) > 20 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="File too large (max 20MB)")
 
-    doc_id = str(uuid.uuid4())
+    # Extract text from PDF
+    pages = extract_text(file_bytes, file.filename)
+    if not pages:
+        raise HTTPException(
+            status_code=400, detail="Could not extract text from PDF"
+        )
 
-    pdfs_dir = Path("./pdfs")
-    pdfs_dir.mkdir(parents=True, exist_ok=True)
-
-    pdf_path = pdfs_dir / f"{doc_id}.pdf"
-    pdf_path.write_bytes(file_bytes)
-
-    md_text = pymupdf4llm.to_markdown(str(pdf_path))
-    
-    md_path = pdfs_dir / f"{doc_id}.md"
-    md_path.write_text(md_text, encoding="utf-8")
-
-    pages = [{"text": md_text}] 
+    # Chunk the text
     chunks = chunk_text(pages)
 
+    # Embed all chunks
     texts = [c["text"] for c in chunks]
     embeddings = embed_texts(texts, task_type="RETRIEVAL_DOCUMENT")
 
+    # Store in ChromaDB
+    doc_id = str(uuid.uuid4())
     add_chunks(doc_id, file.filename, chunks, embeddings)
+    
+    # Save PDF to disk
+    pdfs_dir = Path(os.environ.get("PDF_STORAGE_DIR", "./pdfs"))
+    pdfs_dir.mkdir(parents=True, exist_ok=True)
+    pdf_path = pdfs_dir / f"{doc_id}.pdf"
+    pdf_path.write_bytes(file_bytes)
 
     return UploadResponse(
         id=doc_id,
         filename=file.filename,
         num_chunks=len(chunks),
-        message=f"Successfully converted {file.filename} to Markdown. {len(chunks)} chunks created.",
+        message=f"Successfully processed {file.filename}: {len(chunks)} chunks created",
     )
 
 
@@ -68,8 +71,10 @@ async def get_pdf_file(doc_id: str):
     """Serve the PDF file for a given document ID."""
     pdfs_dir = Path(os.environ.get("PDF_STORAGE_DIR", "./pdfs"))
 
+    # Try {doc_id}.pdf first (from upload endpoint)
     pdf_path = pdfs_dir / f"{doc_id}.pdf"
 
+    # Fall back to original filename from the database (from folder ingestion)
     if not pdf_path.exists():
         meta = _doc_metadata.get(doc_id)
         if meta:
@@ -83,19 +88,3 @@ async def get_pdf_file(doc_id: str):
         media_type="application/pdf",
         filename=pdf_path.name
     )
-
-@router.get("/{doc_id}/markdown")
-async def get_markdown_content(doc_id: str):
-    """Serve the generated Markdown text for a given document ID."""
-    pdfs_dir = Path("./pdfs")
-    md_path = pdfs_dir / f"{doc_id}.md"
-
-    if not md_path.exists():
-        raise HTTPException(status_code=404, detail="Markdown file not found")
-
-    content = md_path.read_text(encoding="utf-8")
-    
-    return {
-        "id": doc_id,
-        "markdown": content
-    }
