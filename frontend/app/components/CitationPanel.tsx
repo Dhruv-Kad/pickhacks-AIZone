@@ -46,8 +46,8 @@ export default function CitationPanel({ sources, onViewPdf }: { sources: Source[
           {(() => {
   const baseName = s.filename.replace(/\.pdf$/i, ""); // remove existing .png if present
 
-  if (baseName.length > 15) {
-    return baseName.slice(0, 15) + "....pdf";
+  if (baseName.length > 12) {
+    return baseName.slice(0, 12) + "....pdf";
   }
 
   return baseName + ".pdf";

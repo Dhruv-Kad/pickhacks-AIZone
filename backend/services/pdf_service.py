@@ -1,39 +1,25 @@
-import fitz  # pymupdf
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
-def extract_text(file_bytes: bytes, filename: str) -> list[dict]:
-    """Extract text from a PDF, returning a list of {page, text} dicts."""
-    doc = fitz.open(stream=file_bytes, filetype="pdf")
-    pages = []
-    for page_num, page in enumerate(doc):
-        text = page.get_text()
-        if text.strip():
-            pages.append({"page": page_num + 1, "text": text})
-    doc.close()
-    return pages
-
-
-def chunk_text(
-    pages: list[dict], chunk_size: int = 1000, overlap: int = 200
-) -> list[dict]:
-    """Split page text into overlapping chunks."""
-    chunks = []
-    chunk_index = 0
-    for page_info in pages:
-        text = page_info["text"]
-        page = page_info["page"]
-        start = 0
-        while start < len(text):
-            end = start + chunk_size
-            chunk_text_slice = text[start:end]
-            if chunk_text_slice.strip():
-                chunks.append(
-                    {
-                        "text": chunk_text_slice,
-                        "page": page,
-                        "chunk_index": chunk_index,
-                    }
-                )
-                chunk_index += 1
-            start += chunk_size - overlap
-    return chunks
+def chunk_text(pages: list[dict], chunk_size: int = 800, chunk_overlap: int = 150) -> list[dict]:
+    """
+    Takes the Markdown string and chunks it for the embedding model,
+    prioritizing Markdown headers and paragraphs to keep context intact.
+    """
+    md_text = pages[0]["text"]
+    
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n# ", "\n## ", "\n### ", "\n\n", "\n", ". ", " "]
+    )
+    
+    split_texts = text_splitter.split_text(md_text)
+    
+    formatted_chunks = []
+    for i, text in enumerate(split_texts):
+        formatted_chunks.append({
+            "chunk_index": i,
+            "text": text
+        })
+        
+    return formatted_chunks

@@ -3,15 +3,20 @@ import os
 import uuid
 from pathlib import Path
 
+import pymupdf4llm
+
 from services.embedding_service import embed_texts
-from services.pdf_service import chunk_text, extract_text
+from services.pdf_service import chunk_text
 from services.vector_store import add_chunks, get_ingested_filenames
 
 logger = logging.getLogger(__name__)
 
 def deletebadfiles(removelist):
     for i in removelist:
-        os.remove("../pdfs/" + i.name)
+        try:
+            os.remove("../pdfs/" + i.name)
+        except OSError as e:
+            logger.warning(f"Could not delete {i.name}: {e}")
 
 def ingest_folder():
     badguylist = []
@@ -37,12 +42,21 @@ def ingest_folder():
             continue
 
         logger.info("Ingesting '%s'...", pdf_path.name)
-        file_bytes = pdf_path.read_bytes()
-
-        pages = extract_text(file_bytes, pdf_path.name)
-        if not pages:
-            logger.warning("Could not extract text from '%s', skipping.", pdf_path.name)
+        
+        try:
+            md_text = pymupdf4llm.to_markdown(str(pdf_path))
+        except Exception as e:
+            logger.warning("Could not extract text from '%s': %s, skipping.", pdf_path.name, e)
             continue
+
+        if not md_text.strip():
+            logger.warning("Extracted Markdown is empty for '%s', skipping.", pdf_path.name)
+            continue
+
+        md_path = pdf_path.with_suffix('.md')
+        md_path.write_text(md_text, encoding="utf-8")
+
+        pages = [{"text": md_text}]
 
         chunks = chunk_text(pages)
         texts = [c["text"] for c in chunks]
@@ -52,4 +66,4 @@ def ingest_folder():
         add_chunks(doc_id, pdf_path.name, chunks, embeddings)
 
         logger.info("Ingested '%s': %d chunks.", pdf_path.name, len(chunks))
-        #deletebadfiles(badguylist)
+        
