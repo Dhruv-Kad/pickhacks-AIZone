@@ -1,18 +1,11 @@
 "use client";
-<<<<<<< HEAD
-=======
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 
 function ViewerContent() {
   const searchParams = useSearchParams();
   const docId = searchParams.get("docId");
-  const page = searchParams.get("page");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -30,28 +23,22 @@ function ViewerContent() {
           </div>
         </div>
 
-        {/* PDF Viewer */}
+        {/* PDF Downloading */}
         <div className="p-4">
-          {error ? (
-            <div className="rounded-md border border-red-300 bg-red-50 p-4 text-red-800">
-              <p className="font-semibold">Error loading PDF</p>
-              <p className="text-sm">{error}</p>
-            </div>
-          ) : !docId ? (
+          {!docId ? (
             <div className="rounded-md border border-yellow-300 bg-yellow-50 p-4 text-yellow-800">
               No document ID provided
             </div>
           ) : (
-            <>
-              <div className="rounded-lg border bg-white shadow-sm">
-                <iframe
-                  src={`${apiBase}/api/documents/${docId}/file${page ? `#page=${page}` : ""}`}
-                  className="h-screen w-full rounded-lg border-0"
-                  onLoad={() => setLoading(false)}
-                  onError={() => setError("Failed to load PDF")}
-                />
+            <div className="flex items-center justify-center rounded-lg border bg-white shadow-sm h-[calc(100vh-200px)]">
+              <div className="text-center">
+                <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+                <p className="text-lg font-medium text-gray-700">
+                  PDF is downloading
+                  <span className="inline-block w-6 text-left animate-pulse">...</span>
+                </p>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -66,4 +53,3 @@ export default function PDFViewer() {
     </Suspense>
   );
 }
->>>>>>> parent of 67190c4 (PDF Down)
