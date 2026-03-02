@@ -21,6 +21,7 @@ def download_pdf(url, folder):
     """Downloads a file from a URL to a folder."""
     try:
         file_name = url.split("/")[-1]
+        file_name = file_name.replace("%","")
         path = os.path.join(folder, file_name)
         response = requests.get(url, timeout=10)
         with open(path, 'wb') as f:
@@ -31,11 +32,11 @@ def download_pdf(url, folder):
 
 def ai_query_web(q, fold):
     linklist = get_pdf_links(q)
-    n = 4
+    n = 2
     for link in linklist:
-        n -= 1
         if n>0:
             download_pdf(link,fold)
+        n -= 1
 
 
 if __name__ == "__main__":

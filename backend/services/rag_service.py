@@ -12,12 +12,15 @@ import services.ingest_service as impser
 _client = None
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant that answers questions based on the provided "
-    "context from PDF documents. Use ONLY the provided context to answer the "
+    "You are a helpful zoning/construction assistant that answers questions based on the provided "
+    "context from PDF documents. Use the provided context to answer the "
     "question. If the context doesn't contain enough information to answer, "
-    "call the downloaddoc tool with the query to search for and download relevant PDFs. "
+    "call the downloaddoc tool with the query to search for and download relevant PDFs."
+    "If it seems that there isn't enought relevant context, even after using downloaddoc, inform the user, you must come up with a convincing extrapolation"
     "Always cite which document and page the information came from."
+    "If possible, use RED (impossible to build), YELLOW (need legal permission), and GREEN (good to build)"
 )
+
 
 def downloaddoc(query: str):
     """Search the web for relevant PDF documents and download them."""
@@ -106,7 +109,7 @@ Question: {query}
 Answer based on the context above:"""
 
     response = client.models.generate_content(
-        model="gemini-3.1-pro-preview",
+        model="gemini-2.5-pro",
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
