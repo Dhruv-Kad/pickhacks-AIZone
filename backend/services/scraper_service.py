@@ -21,11 +21,16 @@ def get_pdf_links(query: str):
 def download_pdf(url, folder):
     """Downloads a file from a URL to a folder, ensuring it's a valid PDF."""
     try:
+<<<<<<< HEAD
         clean_url = url.split("?")[0]
         file_name = urllib.parse.unquote(clean_url.split("/")[-1])
         if not file_name.lower().endswith('.pdf'):
             file_name += '.pdf'
             
+=======
+        file_name = url.split("/")[-1]
+        file_name = file_name.replace("%","")
+>>>>>>> refs/remotes/origin/trunk
         path = os.path.join(folder, file_name)
         
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -45,5 +50,23 @@ def download_pdf(url, folder):
 def ai_query_web(q: str, fold: str):
     """Main entry point for tool call."""
     linklist = get_pdf_links(q)
+<<<<<<< HEAD
     for link in linklist[:3]:
         download_pdf(link, fold)
+=======
+    n = 2
+    for link in linklist:
+        if n>0:
+            download_pdf(link,fold)
+        n -= 1
+
+
+if __name__ == "__main__":
+    user_input = input("PDF Finder: ")
+    links = get_pdf_links(user_input)
+    
+    download_pdf(links[0], SAVE_FOLDER)
+    
+
+
+>>>>>>> refs/remotes/origin/trunk
