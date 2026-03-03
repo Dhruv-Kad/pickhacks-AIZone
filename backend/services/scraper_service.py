@@ -1,16 +1,17 @@
 import os
 import requests
-# from langchain_openai import ChatOpenAI
+import urllib.parse
 
 SEARCH_API_KEY = "3b98fbc57de1326aaf0c02fd03e419ec4f3b9ab3"
-SAVE_FOLDER = "./downloads"
+SAVE_FOLDER = "./pdfs"
+
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 
-def get_pdf_links(query):
-    """Searches Google for PDFs using an API (no browser opened)."""
+def get_pdf_links(query: str):
+    """Searches Google for PDFs using Serper API."""
     url = "https://google.serper.dev/search"
-    payload = {"q": f"{query} filetype:pdf", "num": 10}
+    payload = {"q": f"{query} filetype:pdf", "num": 3}
     headers = {'X-API-KEY': SEARCH_API_KEY, 'Content-Type': 'application/json'}
     
     response = requests.post(url, json=payload, headers=headers)
@@ -18,31 +19,31 @@ def get_pdf_links(query):
     return [item['link'] for item in results if item['link'].endswith('.pdf')]
 
 def download_pdf(url, folder):
-    """Downloads a file from a URL to a folder."""
+    """Downloads a file from a URL to a folder, ensuring it's a valid PDF."""
     try:
-        file_name = url.split("/")[-1]
+        clean_url = url.split("?")[0]
+        file_name = urllib.parse.unquote(clean_url.split("/")[-1])
+        if not file_name.lower().endswith('.pdf'):
+            file_name += '.pdf'
+            
         path = os.path.join(folder, file_name)
-        response = requests.get(url, timeout=10)
-        with open(path, 'wb') as f:
-            f.write(response.content)
-        print(f"Successfully downloaded: {file_name}")
+        
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        response = requests.get(url, timeout=10, headers=headers)
+        
+        content_type = response.headers.get('Content-Type', '').lower()
+        if response.status_code == 200 and 'application/pdf' in content_type:
+            with open(path, 'wb') as f:
+                f.write(response.content)
+            print(f"Successfully downloaded: {file_name}")
+        else:
+            print(f"Skipped {url}: Server did not return a valid PDF document.")
+            
     except Exception as e:
         print(f"Failed to download {url}: {e}")
 
-def ai_query_web(q, fold):
+def ai_query_web(q: str, fold: str):
+    """Main entry point for tool call."""
     linklist = get_pdf_links(q)
-    n = 4
-    for link in linklist:
-        n -= 1
-        if n>0:
-            download_pdf(link,fold)
-
-
-if __name__ == "__main__":
-    user_input = input("PDF Finder: ")
-    links = get_pdf_links(user_input)
-    
-    download_pdf(links[0], SAVE_FOLDER)
-    
-
-
+    for link in linklist[:3]:
+        download_pdf(link, fold)

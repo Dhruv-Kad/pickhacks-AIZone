@@ -1,5 +1,4 @@
-import fitz  # pymupdf
-
+import fitz
 
 def extract_text(file_bytes: bytes, filename: str) -> list[dict]:
     """Extract text from a PDF, returning a list of {page, text} dicts."""
@@ -12,7 +11,6 @@ def extract_text(file_bytes: bytes, filename: str) -> list[dict]:
     doc.close()
     return pages
 
-
 def chunk_text(
     pages: list[dict], chunk_size: int = 1000, overlap: int = 200
 ) -> list[dict]:
@@ -21,7 +19,8 @@ def chunk_text(
     chunk_index = 0
     for page_info in pages:
         text = page_info["text"]
-        page = page_info["page"]
+        page = page_info.get("page", 1) 
+        
         start = 0
         while start < len(text):
             end = start + chunk_size

@@ -1,6 +1,8 @@
 export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
+  sources?: Source[];
+  _pending?: boolean;
 };
 
 export type Source = {
@@ -8,8 +10,8 @@ export type Source = {
   page: number;
   relevance_score: number;
   chunk_preview: string;
+  exact_quote?: string;
 
-  // add these (optional for now)
   docId?: string;
   pdfUrl?: string;
 };

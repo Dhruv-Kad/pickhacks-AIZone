@@ -88,3 +88,18 @@ async def get_pdf_file(doc_id: str):
         media_type="application/pdf",
         filename=pdf_path.name
     )
+
+# backend/routers/documents.py
+
+@router.get("/{doc_id}/markdown")
+async def get_markdown_content(doc_id: str):
+    """Serve the generated Markdown text for a given document ID."""
+    # Ensure this matches the PDF_INGEST_DIR or storage path
+    storage_dir = Path("./pdfs") 
+    md_path = storage_dir / f"{doc_id}.md"
+
+    if not md_path.exists():
+        raise HTTPException(status_code=404, detail="Markdown file not found")
+
+    content = md_path.read_text(encoding="utf-8")
+    return {"id": doc_id, "markdown": content}

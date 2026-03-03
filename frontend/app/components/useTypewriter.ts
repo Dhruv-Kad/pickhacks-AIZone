@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const TYPING_SPEED_MS = 20; // Milliseconds between each character
+const TYPING_SPEED_MS = 1; // Milliseconds between each character
 
 export function useTypewriter(text: string, shouldAnimate: boolean = true) {
   const [displayedText, setDisplayedText] = useState("");

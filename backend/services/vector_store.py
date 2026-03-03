@@ -21,7 +21,6 @@ def init_chroma():
     )
     rebuild_doc_metadata()
 
-
 def rebuild_doc_metadata():
     """Reconstruct document metadata from ChromaDB on startup."""
     all_data = _collection.get(include=["metadatas"])
@@ -32,43 +31,31 @@ def rebuild_doc_metadata():
             seen[doc_id] = {
                 "filename": meta["filename"],
                 "num_chunks": 0,
-                "uploaded_at": "unknown",
+                "uploaded_at": meta.get("uploaded_at", "unknown"),
             }
         seen[doc_id]["num_chunks"] += 1
     _doc_metadata.update(seen)
 
-
-def get_collection():
-    return _collection
-
-
-def add_chunks(
-    doc_id: str,
-    filename: str,
-    chunks: list[dict],
-    embeddings: list[list[float]],
-):
-    """Add document chunks with embeddings to ChromaDB."""
+def add_chunks(doc_id, filename, chunks, embeddings):
+    uploaded_at = datetime.now(timezone.utc).isoformat()
     ids = [f"{doc_id}_chunk_{i}" for i in range(len(chunks))]
     documents = [c["text"] for c in chunks]
     metadatas = [
         {
             "document_id": doc_id,
             "filename": filename,
-            "page": c["page"],
+            "page": c.get("page", 1),
             "chunk_index": c["chunk_index"],
+            "uploaded_at": uploaded_at,
         }
         for c in chunks
     ]
-    _collection.add(
-        ids=ids, embeddings=embeddings, documents=documents, metadatas=metadatas
-    )
+    _collection.add(ids=ids, embeddings=embeddings, documents=documents, metadatas=metadatas)
     _doc_metadata[doc_id] = {
         "filename": filename,
         "num_chunks": len(chunks),
-        "uploaded_at": datetime.now(timezone.utc).isoformat(),
+        "uploaded_at": uploaded_at,
     }
-
 
 def query_chunks(
     query_embedding: list[float],

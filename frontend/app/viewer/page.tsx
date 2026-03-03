@@ -1,219 +1,57 @@
 "use client";
-import { useSearchParams } from "next/navigation";
 
+import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { useSearchParams } from 'next/navigation';
 
-
-import { Suspense, useEffect, useState } from "react";
-
-
-
-
-
-function ViewerContent() {
-
-
+export default function ViewerPage() {
   const searchParams = useSearchParams();
+  const docId = searchParams.get('docId'); 
 
-
-  const docId = searchParams.get("docId");
-
-
-  const page = searchParams.get("page");
-
-
+  const [documentText, setDocumentText] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (!docId) return;
 
-  const [error, setError] = useState<string | null>(null);
-
-
-
-
-
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-
-
-
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    fetch(`${apiUrl}/api/documents/${docId}/markdown`)
+      .then(res => res.json())
+      .then(data => {
+        setDocumentText(data.markdown);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching document text:", err);
+        setDocumentText("# Error\nCould not load the document text.");
+        setLoading(false);
+      });
+  }, [docId]);
 
   return (
+    <div className="min-h-screen w-full bg-gray-100 p-8 flex justify-center">
+      {/* The "Box" where text is printed */}
+      <div className="w-full max-w-5xl bg-white shadow-xl rounded-lg border border-gray-200 p-10">
+        
+        <h1 className="text-3xl font-bold mb-6 pb-4 border-b text-gray-800">
+          Document Text Viewer
+        </h1>
 
-
-    <div className="min-h-screen bg-gray-50">
-
-
-      <div className="mx-auto max-w-6xl">
-
-
-        {/* Header */}
-
-
-        <div className="border-b bg-gray-100 px-4 py-4 shadow-sm">
-
-
-          <div className="flex items-center justify-between">
-
-
-            <h1 className="text-xl font-semibold">PDF Viewer</h1>
-
-
-            <button
-
-
-              onClick={() => window.close()}
-
-
-              className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
-
-
-            >
-
-
-              Close
-
-
-            </button>
-
-
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+             <p className="animate-pulse text-lg text-gray-500">Extracting text from document...</p>
           </div>
-
-
-        </div>
-
-
-
-
-
-        {/* PDF Viewer */}
-
-
-        <div className="p-4">
-
-
-          {error ? (
-
-
-            <div className="rounded-md border border-red-300 bg-red-50 p-4 text-red-800">
-
-
-              <p className="font-semibold">Error loading PDF</p>
-
-
-              <p className="text-sm">{error}</p>
-
-
-            </div>
-
-
-          ) : !docId ? (
-
-
-            <div className="rounded-md border border-yellow-300 bg-yellow-50 p-4 text-yellow-800">
-
-
-              No document ID provided
-
-
-            </div>
-
-
-          ) : (
-
-
-            <div className="relative rounded-lg border bg-white shadow-sm">
-
-
-              {loading && (
-
-
-                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white">
-
-
-                  <div className="text-center">
-
-
-                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-
-
-                    <p className="text-lg font-medium text-gray-700">
-
-
-                      PDF is downloading
-
-
-                      <span className="inline-block w-6 text-left animate-pulse">...</span>
-
-
-                    </p>
-
-
-                  </div>
-
-
-                </div>
-
-
-              )}
-
-
-              <iframe
-
-
-                src={`${apiBase}/api/documents/${docId}/file${page ? `#page=${page}` : ""}`}
-
-
-                className="h-screen w-full rounded-lg border-0"
-
-
-                onLoad={() => setLoading(false)}
-
-
-                onError={() => setError("Failed to load PDF")}
-
-
-              />
-
-
-            </div>
-
-
-          )}
-
-
-        </div>
-
+        ) : (
+          <div className="prose prose-lg max-w-none text-gray-700">
+            {/* Prints the text inside the box using markdown formatting */}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {documentText}
+            </ReactMarkdown>
+          </div>
+        )}
 
       </div>
-
-
     </div>
-
-
   );
-
-
-}
-
-
-
-
-
-export default function PDFViewer() {
-
-
-  return (
-
-
-    <Suspense fallback={<div>Loading...</div>}>
-
-
-      <ViewerContent />
-
-
-    </Suspense>
-
-
-  );
-
-
 }
