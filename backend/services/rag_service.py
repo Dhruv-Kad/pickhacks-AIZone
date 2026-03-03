@@ -12,7 +12,6 @@ import services.ingest_service as impser
 _client = None
 
 SYSTEM_PROMPT = (
-<<<<<<< HEAD
     "You are a zoning and construction assistant. "
     "First, check if the provided context contains the answer to the user's question. "
     "If it DOES, answer the question and cite the document and page number. "
@@ -25,17 +24,7 @@ SYSTEM_PROMPT = (
     "yellow means yes you can do it but there are restrictions and show the restrictions, " 
     "and red means no, under no circumstances can you do this and say why. If its a question like 'can I do this', " 
     "you must list each section Green, yellow, and red and say the regulations for each."
-=======
-    "You are a helpful zoning/construction assistant that answers questions based on the provided "
-    "context from PDF documents. Use the provided context to answer the "
-    "question. If the context doesn't contain enough information to answer, "
-    "call the downloaddoc tool with the query to search for and download relevant PDFs."
-    "If it seems that there isn't enought relevant context, even after using downloaddoc, inform the user, you must come up with a convincing extrapolation"
-    "Always cite which document and page the information came from."
-    "If possible, use RED (impossible to build), YELLOW (need legal permission), and GREEN (good to build)"
->>>>>>> refs/remotes/origin/trunk
 )
-
 
 def downloaddoc(query: str):
     """Search the web for relevant PDF documents and download them."""
@@ -124,19 +113,6 @@ Question: {query}"""
             "sources": sources
         }
 
-<<<<<<< HEAD
-=======
-    response = client.models.generate_content(
-        model="gemini-2.5-pro",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            tools=[downloaddoc_tool],
-        ),
-    )
-
-    # Check if Gemini wants to call the downloaddoc tool
->>>>>>> refs/remotes/origin/trunk
     if response.candidates and response.candidates[0].content.parts:
         for part in response.candidates[0].content.parts:
             if part.function_call and part.function_call.name == "downloaddoc":
